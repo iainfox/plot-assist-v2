@@ -18,15 +18,15 @@
 
             <ul class="list" id="available-channels">
                 <li>
-                    <input type="checkbox" class="channel" id="cosine"> <label for="cosine">cosine</label>
+                    <input type="checkbox" class="channel" id="cosine"> <label>cosine</label>
                 </li>
 
                 <li>
-                    <input type="checkbox" class="channel" id="linear"> <label for="linear">linear</label>
+                    <input type="checkbox" class="channel" id="linear"> <label>linear</label>
                 </li>
 
                 <li>
-                    <input type="checkbox" class="channel" id="sine"> <label for="sine">sine</label>
+                    <input type="checkbox" class="channel" id="sine"> <label>sine</label>
                 </li>
             </ul>
         </div>
@@ -54,8 +54,15 @@
         </div>
     </section>
 
-    <section>
-        <p>Selected Channels</p>
+    <section class="flex-column">
+        <div class="title">
+            <input type="text" placeholder="Search channels.." id="selected-channels-search">
+            <p>Selected Channels</p>
+        </div>
+
+        <ul class="list" id="selected-channels">
+
+        </ul>
     </section>
 
     <section>

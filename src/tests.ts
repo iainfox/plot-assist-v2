@@ -9,7 +9,6 @@ if (available_channels_list) {
         input.id = String(i);
 
         const label = document.createElement('label');
-        label.setAttribute('for', String(i));
         label.textContent = String(i);
 
         li.appendChild(input);
