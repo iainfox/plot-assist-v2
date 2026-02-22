@@ -14,8 +14,8 @@ html, body {
 }
 
 body {
-    min-height: 100vh;
     min-width: 100vw;
+    height: 100vh;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     background-color: var(--white);
@@ -25,7 +25,6 @@ body {
 }
 
 section {
-    min-height: 100vh;
     padding: 10px;
     display: flex;
     flex-direction: column;
