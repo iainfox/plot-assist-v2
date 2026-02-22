@@ -22,10 +22,11 @@ body {
     color: var(--black);
 
     overflow: hidden;
+    padding: 10px;
+    gap: 3px;
 }
 
-section {
-    padding: 10px;
+.flex-column {
     display: flex;
     flex-direction: column;
 }
@@ -54,11 +55,33 @@ section {
 
 .channel:checked + label {
     background-color: aqua;
-    border: none;
 }
 
 label {
     width: 100%;
     display: block;
     user-select: none;
+}
+
+.left-column {
+    display: grid;
+    grid-template-columns: 9fr 1fr;
+    gap: 5px;
+}
+
+.selection-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    margin-top: 24px;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.button-group button + button {
+    margin-top: 2px;
 }

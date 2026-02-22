@@ -9,25 +9,49 @@
 </head>
 
 <body>
-    <section>
-        <div class="title">
-            <input type="text" placeholder="Search channels.." id="available-channels-search">
-            <p>Available Channels</p>
+    <section class="left-column">
+        <div class="flex-column">
+            <div class="title">
+                <input type="text" placeholder="Search channels.." id="available-channels-search">
+                <p>Available Channels</p>
+            </div>
+
+            <ul class="list" id="available-channels">
+                <li>
+                    <input type="checkbox" class="channel" id="cosine"> <label for="cosine">cosine</label>
+                </li>
+
+                <li>
+                    <input type="checkbox" class="channel" id="linear"> <label for="linear">linear</label>
+                </li>
+
+                <li>
+                    <input type="checkbox" class="channel" id="sine"> <label for="sine">sine</label>
+                </li>
+            </ul>
         </div>
+        
+        <div class="selection-buttons">
+            <div class="button-group">
+                <!--
+                gt = greater than
+                lt = less than
+                -->
+                <button>&gt;&gt;</button>
+                <button>[&gt;&gt;]</button>
+                <button>&gt;</button>
+                <button>[&gt;]</button>
+            </div>
 
-        <ul class="list" id="available-channels">
-            <li>
-                <input type="checkbox" class="channel" id="cosine"> <label for="cosine">cosine</label>
-            </li>
-
-            <li>
-                <input type="checkbox" class="channel" id="linear"> <label for="linear">linear</label>
-            </li>
-
-            <li>
-                <input type="checkbox" class="channel" id="sine"> <label for="sine">sine</label>
-            </li>
-        </ul>
+            <div class="button-group">
+                <button>[&lt;&gt;]</button>
+                <button>[&gt;&lt;]</button>
+                <button>↑</button>
+                <button>↓</button>
+                <button>&lt;</button>
+                <button>&lt;&lt;</button>
+            </div>
+        </div>
     </section>
 
     <section>
