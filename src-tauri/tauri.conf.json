@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "plot-assist",
+        "title": "Plot Assist",
         "width": 1050,
         "height": 400
       }
