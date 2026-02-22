@@ -27,25 +27,26 @@ search_available_channels?.addEventListener("input", () => { // gets a little la
     }
 });
 
-function deselect_all() {
-    if (!available_channels_list) return;
-    const checkboxes = available_channels_list.querySelectorAll<HTMLInputElement>('.channel:checked');
+function select_all(list: HTMLElement, deselect?: boolean) {
+    if (!list) return;
+    const checkboxes = list.querySelectorAll<HTMLInputElement>('.channel:checked');
     checkboxes.forEach((checkbox) => {
-        checkbox.checked = false;
+        checkbox.checked = deselect ? false : true;
     });
 }
 
-function deselect_range(a: number, b: number) {
-    if (!available_channels_list?.children) return
+
+function select_range(list: HTMLElement, a: number, b: number, deselect?: boolean): void {
+    if (!list?.children) return;
 
     let start = Math.min(a, b);
     let end = Math.max(a, b);
 
     for (let i = start; i <= end; i++) {
-        const currentLi = available_channels_list.children[i] as HTMLElement;
+        const currentLi = list.children[i] as HTMLElement;
         const input = currentLi.querySelector<HTMLInputElement>('.channel');
         if (input) {
-            input.checked = false;
+            input.checked = deselect ? false : true;
         }
     }
 }
