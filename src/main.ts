@@ -49,7 +49,6 @@ function select_all(list: HTMLElement, deselect?: boolean) {
     });
 }
 
-
 function select_range(list: HTMLElement, a: number, b: number, deselect?: boolean): void {
     if (!list?.children) return;
 
@@ -59,7 +58,7 @@ function select_range(list: HTMLElement, a: number, b: number, deselect?: boolea
     for (let i = start; i <= end; i++) {
         const currentLi = list.children[i] as HTMLElement;
         const input = currentLi.querySelector<HTMLInputElement>('.channel');
-        if (input) {
+        if (input && currentLi.style.display != "none") {
             input.checked = deselect ? false : true;
         }
     }
