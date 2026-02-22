@@ -14,4 +14,4 @@ df = pandas.DataFrame({
     'square_wave': square_wave
 })
 
-df.to_csv("test.csv")
+df.to_csv("test.csv", index_label="idx")
