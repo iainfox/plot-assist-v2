@@ -1,5 +1,6 @@
 :root {
     --white: #ececec;
+    --off-white: #e2e2e2;
     --black: #252525;
 }
 
@@ -94,4 +95,12 @@ label {
 
 .selected {
     border: 1px outset black;
+}
+
+li {
+    transition: background-color .1s ease-in-out;
+}
+
+li:hover {
+    background-color: var(--off-white);
 }
