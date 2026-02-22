@@ -2,6 +2,7 @@ import { select_all, select_range } from "./selection_utils";
 
 const search_selected_channels = document.getElementById("selected-channels-search");
 const selected_channels_list = document.getElementById("selected-channels");
+const available_channels_list = document.getElementById("available-channels");
 
 search_selected_channels?.addEventListener("input", () => { // gets a little laggy at ~5000 elements
     if (!search_selected_channels || !selected_channels_list) return;
@@ -87,4 +88,14 @@ selected_channels_list?.addEventListener("mouseover", (e) => {
     if (!li) return;
     const checkbox = li.querySelector<HTMLInputElement>('.channel');
     checkbox?.click()
+});
+
+selected_channels_list?.addEventListener("click", () => {
+    if (selected_channels_list) {
+        selected_channels_list.classList.add("selected");
+    }
+    if (available_channels_list) {
+        available_channels_list.classList.remove("selected");
+        select_all(available_channels_list, true)
+    }
 });
