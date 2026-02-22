@@ -1,0 +1,65 @@
+:root {
+    --white: #ececec;
+    --black: #252525;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    min-width: 100vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color: var(--white);
+    color: var(--black);
+
+    overflow: hidden;
+}
+
+section {
+    min-height: 100vh;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.title p {
+    display: inline;
+}
+
+.list {
+    list-style-type: none;
+    background-color: white;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.channel {
+    display: none;
+}
+
+.channel:checked + label {
+    background-color: aqua;
+    border: none;
+}
+
+label {
+    width: 100%;
+    display: block;
+    user-select: none;
+}
