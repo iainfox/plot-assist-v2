@@ -109,7 +109,7 @@ available_channels_list?.addEventListener("mousedown", (e) => {
     e.preventDefault();
 });
 
-available_channels_list?.addEventListener("mouseup", (e) => {
+available_channels_list?.addEventListener("mouseup", (_) => {
     mouse_down = false;
 });
 
