@@ -86,3 +86,8 @@ label {
 .button-group button + button {
     margin-top: 2px;
 }
+
+.plot-button {
+    height: 10%;
+    margin: 10px
+}
