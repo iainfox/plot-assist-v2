@@ -138,3 +138,77 @@ available_channels_list?.addEventListener("mouseover", (e) => {
     const checkbox = li.querySelector<HTMLInputElement>('.channel');
     checkbox?.click()
 });
+
+let recent_selection_sc: HTMLElement | null;
+let recent_shift_selection_sc: HTMLElement | null;
+let mouse_down_sc: boolean = false;
+
+selected_channels_list?.addEventListener("mousedown", (e) => {
+    const target = e.target as HTMLElement;
+    mouse_down_sc = true;
+
+    const li = target.closest('li');
+    if (!li) return;
+    const checkbox = li.querySelector<HTMLInputElement>('.channel');
+
+    if (!checkbox) return;
+    if (!selected_channels_list?.children) return;
+
+    if (e.ctrlKey) {
+        checkbox.checked = !checkbox.checked;
+
+        if (checkbox.checked) {
+            recent_selection_sc = li
+            recent_shift_selection_sc = null;
+        } else {
+            recent_selection_sc = null
+        }
+    } else if (e.shiftKey) {
+        mouse_down_sc = false;
+        let selected = li;
+        let selected_idx = Array.from(selected_channels_list.children).indexOf(li);
+
+        if (selected === recent_selection_sc) { checkbox.checked = true; return };
+        if (recent_selection_sc == null) {
+            recent_selection_sc = li;
+            checkbox.checked = true;
+            return;
+        }
+
+        if (recent_shift_selection_sc != null) {
+            let recent_shift_selection_sc_idx = Array.from(selected_channels_list.children).indexOf(recent_shift_selection_sc);
+            select_range(selected_channels_list, selected_idx, recent_shift_selection_sc_idx, true);
+        }
+        recent_shift_selection_sc = selected;
+        
+        let recent_selection_sc_idx = Array.from(selected_channels_list.children).indexOf(recent_selection_sc);
+        select_range(selected_channels_list, selected_idx, recent_selection_sc_idx)
+    } else {
+        select_all(selected_channels_list, true);
+        checkbox.checked = true;
+
+        recent_selection_sc = li;
+        recent_shift_selection_sc = null;
+    }
+
+    e.preventDefault();
+});
+
+selected_channels_list?.addEventListener("mouseup", (_) => {
+    mouse_down_sc = false;
+});
+
+selected_channels_list?.addEventListener("mouseleave", (_) => {
+    mouse_down_sc = false;
+});
+
+selected_channels_list?.addEventListener("mouseover", (e) => {
+    if (!mouse_down_sc) return;
+
+    const target = e.target as HTMLElement;
+
+    const li = target.closest('li');
+    if (!li) return;
+    const checkbox = li.querySelector<HTMLInputElement>('.channel');
+    checkbox?.click()
+});
