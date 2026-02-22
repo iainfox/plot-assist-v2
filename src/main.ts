@@ -65,13 +65,13 @@ function select_range(list: HTMLElement, a: number, b: number, deselect?: boolea
     }
 }
 
-let recent_slection: number = -1;
-let recent_shift_slection: number = -1;
-let mouse_down: boolean = false;
+let recent_selection_ac: HTMLElement | null;
+let recent_shift_selection_ac: HTMLElement | null;
+let mouse_down_ac: boolean = false;
 
 available_channels_list?.addEventListener("mousedown", (e) => {
     const target = e.target as HTMLElement;
-    mouse_down = true;
+    mouse_down_ac = true;
 
     const li = target.closest('li');
     if (!li) return;
@@ -84,52 +84,52 @@ available_channels_list?.addEventListener("mousedown", (e) => {
         checkbox.checked = !checkbox.checked;
 
         if (checkbox.checked) {
-            recent_slection = Array.from(available_channels_list.children).indexOf(li)
-            recent_shift_slection = -1;
+            recent_selection_ac = li
+            recent_shift_selection_ac = null;
         } else {
-            recent_slection = -1
+            recent_selection_ac = null
         }
     } else if (e.shiftKey) {
-        let selected = Array.from(available_channels_list.children).indexOf(li);
-        if (selected === recent_slection) { checkbox.checked = true; return };
-        if (recent_slection == -1) {
-            recent_slection = Array.from(available_channels_list.children).indexOf(li)
+        mouse_down_ac = false;
+        let selected = li;
+        let selected_idx = Array.from(available_channels_list.children).indexOf(li);
+
+        if (selected === recent_selection_ac) { checkbox.checked = true; return };
+        if (recent_selection_ac == null) {
+            recent_selection_ac = li;
             checkbox.checked = true;
             return;
         }
 
-        if (recent_shift_slection != -1) {
-            deselect_range(selected, recent_shift_slection);
+        if (recent_shift_selection_ac != null) {
+            let recent_shift_selection_ac_idx = Array.from(available_channels_list.children).indexOf(recent_shift_selection_ac);
+            select_range(available_channels_list, selected_idx, recent_shift_selection_ac_idx, true);
         }
-        recent_shift_slection = selected;
-
-        let start = Math.min(selected, recent_slection);
-        let end = Math.max(selected, recent_slection);
-
-        for (let i = start; i <= end; i++) {
-            const currentLi = available_channels_list.children[i] as HTMLElement;
-            const input = currentLi.querySelector<HTMLInputElement>('.channel');
-            if (input) {
-                input.checked = true;
-            }
-        }
+        recent_shift_selection_ac = selected;
+        
+        let recent_selection_ac_idx = Array.from(available_channels_list.children).indexOf(recent_selection_ac);
+        select_range(available_channels_list, selected_idx, recent_selection_ac_idx)
     } else {
-        deselect_all();
+        select_all(available_channels_list, true);
         checkbox.checked = true;
 
-        recent_slection = Array.from(available_channels_list.children).indexOf(li)
-        recent_shift_slection = -1;
+        recent_selection_ac = li;
+        recent_shift_selection_ac = null;
     }
 
     e.preventDefault();
 });
 
 available_channels_list?.addEventListener("mouseup", (_) => {
-    mouse_down = false;
+    mouse_down_ac = false;
+});
+
+available_channels_list?.addEventListener("mouseleave", (_) => {
+    mouse_down_ac = false;
 });
 
 available_channels_list?.addEventListener("mouseover", (e) => {
-    if (!mouse_down) return;
+    if (!mouse_down_ac) return;
 
     const target = e.target as HTMLElement;
 
