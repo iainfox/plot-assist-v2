@@ -67,7 +67,7 @@ label {
 .left-column {
     display: grid;
     grid-template-columns: 9fr 1fr;
-    gap: 5px;
+    gap: 3px;
 }
 
 .selection-buttons {
