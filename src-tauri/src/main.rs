@@ -5,5 +5,5 @@ mod read_file_passed;
 
 fn main() {
     read_file_passed::run();
-    tauri_test_lib::run()
+    plot_assist_v2_lib::run()
 }
