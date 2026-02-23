@@ -63,6 +63,7 @@ label {
     width: 100%;
     display: block;
     user-select: none;
+    transition: all .1s linear;
 }
 
 .left-column {
