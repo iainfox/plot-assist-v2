@@ -1,0 +1,30 @@
+pub fn parse_file(file_path: &str) -> Option<(Vec<String>, Vec<Vec<f32>>)> {
+    if !std::path::Path::new(file_path).exists() {
+        return None;
+    }
+
+    let file = std::fs::File::open(file_path).ok()?;
+    use std::io::{self, BufRead};
+
+    let mut reader = io::BufReader::new(file);
+
+    let mut first_line = String::new();
+    reader.read_line(&mut first_line).ok()?;
+
+    let names: Vec<String> = first_line
+        .trim_end()
+        .split(',')
+        .map(|s| s.to_string())
+        .collect();
+
+    let mut data: Vec<Vec<f32>> = Vec::new();
+    for line in reader.lines().flatten() {
+        let row: Vec<f32> = line
+            .split(',')
+            .filter_map(|s| s.trim().parse::<f32>().ok())
+            .collect();
+        data.push(row);
+    }
+
+    Some((names, data))
+}
