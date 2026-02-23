@@ -3,7 +3,7 @@ use std::env;
 pub fn run() {
     let args: Vec<String> = env::args().collect();
 
-    if !args.len() > 1 {
+    if !(args.len() > 1) {
         return;
     };
 
