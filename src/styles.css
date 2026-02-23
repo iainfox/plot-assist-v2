@@ -104,3 +104,37 @@ li {
 li:hover {
     background-color: var(--off-white);
 }
+
+.hidden {
+    display: none;
+}
+
+#list-warning {
+    padding: 0;
+    margin: 0;
+    height: 0;
+    flex-grow: 1;
+    background-color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#file-drop-area {
+    transition: border .25s ease-in-out;
+    border: 2px dashed #aaaaaa;
+    padding: 20px;
+    text-align: center;
+}
+
+#file-drop-area:hover {
+    border: 2px dashed #888;
+}
+
+.file-drop-label {
+    color: blue;
+    text-decoration: none;
+    cursor: pointer;
+}

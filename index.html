@@ -16,21 +16,20 @@
                 <p>Available Channels</p>
             </div>
 
-            <ul class="list" id="available-channels">
-                <li>
-                    <input type="checkbox" class="channel" id="cosine"> <label>cosine</label>
-                </li>
+            <div id="list-warning">
+                <p>Waiting for input...</p>
+                <div id="file-drop-area">
+                    <p>Drag &amp; drop your file here or <label for="file-input"
+                            class="file-drop-label">browse</label></p>
+                    <input type="file" id="file-input" class="hidden">
+                </div>
+            </div>
 
-                <li>
-                    <input type="checkbox" class="channel" id="linear"> <label>linear</label>
-                </li>
+            <ul class="list hidden" id="available-channels">
 
-                <li>
-                    <input type="checkbox" class="channel" id="sine"> <label>sine</label>
-                </li>
             </ul>
         </div>
-        
+
         <div class="selection-buttons">
             <div class="button-group">
                 <!--
@@ -62,10 +61,6 @@
 
         <ul class="list" id="selected-channels">
 
-            <li>
-                <input type="checkbox" class="channel" id="sine"> <label>sine</label>
-            </li>
-
         </ul>
 
         <button class="plot-button">Plot</button>
@@ -76,7 +71,7 @@
     </section>
 
     <script src="./src/main.ts" type="module"></script>
-    <script src="./src/tests.ts"></script>
+    <!-- <script src="./src/tests.ts"></script> -->
 </body>
 
 </html>
