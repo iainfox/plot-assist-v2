@@ -1,5 +1,8 @@
-pub fn parse_file(file_path: &str) -> Option<(Vec<String>, Vec<Vec<f32>>)> {
-    if !std::path::Path::new(file_path).exists() {
+use std::env;
+
+pub fn parse_file() -> Option<(Vec<String>, Vec<Vec<f32>>)> {
+    let file_path = env::args().last().unwrap_or_default();
+    if !std::path::Path::new(&file_path).exists() {
         return None;
     }
 
