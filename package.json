@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "tauri:dev": "tauri dev -- -- \"./test.csv\""
+    "tauri:dev": "tauri dev -- -- \"./test_data_low.csv\""
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
