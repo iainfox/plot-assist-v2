@@ -64,18 +64,15 @@ impl FileData {
         }
     }
 
-    pub fn get_data(&self, channel: String) -> Option<Vec<f32>> {
-        if self.names.contains(&channel) {
-            self.data.get(&channel);
-        }
-        None
+    pub fn get_data(&self, channel: &str) -> Option<&[f32]> {
+        self.data.get(channel).map(|v| v.as_slice())
     }
 
-    pub fn get_names(&self) -> Vec<String> {
-        self.names.to_vec()
+    pub fn get_names(&self) -> &[String] {
+        &self.names
     }
 
-    pub fn get_index(&self) -> Vec<String> {
-        self.idx.to_vec()
+    pub fn get_index(&self) -> &[String] {
+        &self.idx
     }
 }
