@@ -7,7 +7,7 @@ pub struct FileData {
 }
 
 impl FileData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         let file_path = env::args().last().unwrap_or_default();
         if !std::path::Path::new(&file_path).exists() {
             panic!("File path does not exist: {}", file_path);
