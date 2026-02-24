@@ -29,5 +29,5 @@ pub fn parse_file() -> Option<(Vec<String>, Vec<Vec<f32>>)> {
         data.push(row);
     }
 
-    Some((names, data))
+    Some((names[1..].to_vec(), data))
 }
