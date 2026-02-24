@@ -1,6 +1,6 @@
 use std::{collections::HashMap, env};
 
-struct FileData {
+pub struct FileData {
     names: Vec<String>,
     data: HashMap<String, Vec<f32>>,
     idx: Vec<String>,
