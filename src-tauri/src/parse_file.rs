@@ -1,6 +1,6 @@
 use std::env;
 
-pub fn parse_file() -> Option<(Vec<String>, Vec<Vec<f32>>)> {
+pub fn parse_file() -> Option<(Vec<String>, Vec<Vec<f32>>, Vec<String>)> {
     let file_path = env::args().last().unwrap_or_default();
     if !std::path::Path::new(&file_path).exists() {
         return None;
@@ -21,13 +21,16 @@ pub fn parse_file() -> Option<(Vec<String>, Vec<Vec<f32>>)> {
         .collect();
 
     let mut data: Vec<Vec<f32>> = Vec::new();
+    let mut idx: Vec<String> = Vec::new();
+
     for line in reader.lines().flatten() {
         let row: Vec<f32> = line
             .split(',')
             .filter_map(|s| s.trim().parse::<f32>().ok())
             .collect();
-        data.push(row);
+        idx.push(row[0].to_string());
+        data.push(row[1..].to_vec());
     }
 
-    Some((names[1..].to_vec(), data))
+    Some((names[1..].to_vec(), data, idx))
 }
