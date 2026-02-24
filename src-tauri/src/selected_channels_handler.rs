@@ -15,12 +15,8 @@ pub struct Channel {
     data: Vec<f32>,
 }
 
-struct ChannelGroup {
-    channels: Vec<Channel>,
-}
-
 pub struct ChannelSystem {
-    groups: Vec<ChannelGroup>,
+    groups: Vec<Vec<Channel>>,
 }
 
 impl ChannelSystem {
@@ -50,15 +46,15 @@ impl ChannelSystem {
 
     pub fn combine(&mut self, a: usize, b: usize) {
         let mut other = self.groups.remove(b);
-        self.groups[a].channels.append(&mut other.channels);
+        self.groups[a].append(&mut other);
     }
  
     pub fn add_channels(&mut self, channels: Vec<Channel>, grouped: bool) {
         if grouped {
-            self.groups.push(ChannelGroup { channels });
+            self.groups.push(channels);
         } else {
             for channel in channels {
-                self.groups.push(ChannelGroup { channels: vec![channel] });
+                self.groups.push(vec![channel]);
             }
         }
     }
@@ -66,7 +62,7 @@ impl ChannelSystem {
     pub fn remove_channels(&mut self, group_indices: &[usize], channel_names: &[String]) {
         for &group_index in group_indices.iter() {
             if let Some(group) = self.groups.get_mut(group_index) {
-                group.channels.retain(|ch: &Channel| !channel_names.contains(&ch.name));
+                group.retain(|ch: &Channel| !channel_names.contains(&ch.name));
             }
         }
     }
