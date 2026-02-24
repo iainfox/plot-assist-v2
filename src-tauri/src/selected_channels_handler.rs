@@ -19,7 +19,7 @@ struct ChannelGroup {
     channels: Vec<Channel>,
 }
 
-struct ChannelSystem {
+pub struct ChannelSystem {
     groups: Vec<ChannelGroup>,
 }
 
