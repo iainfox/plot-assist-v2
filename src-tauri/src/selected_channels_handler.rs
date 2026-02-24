@@ -59,7 +59,7 @@ impl ChannelSystem {
         }
     }
  
-    pub fn remove_channels(&mut self, group_indices: &[usize], channel_names: &[String]) {
+    pub fn remove_channels(&mut self, group_indices: Vec<usize>, channel_names: Vec<String>) {
         for &group_index in group_indices.iter() {
             if let Some(group) = self.groups.get_mut(group_index) {
                 group.retain(|ch: &Channel| !channel_names.contains(&ch.name));
