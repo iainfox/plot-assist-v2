@@ -9,7 +9,7 @@
 // }
 
 // Here's how you'd do it in Rust:
-
+#[derive(Clone)]
 pub struct Channel {
     name: String,
     data: Vec<f32>,
