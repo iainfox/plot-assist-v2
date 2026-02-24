@@ -70,4 +70,8 @@ impl ChannelSystem {
     pub fn remove_all(&mut self) {
         self.groups.clear();
     }
+
+    pub fn get_groups(&self) -> &[Vec<Channel>] {
+        &self.groups
+    }
 }
