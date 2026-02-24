@@ -1,36 +1,66 @@
-use std::env;
+use std::{collections::HashMap, env};
 
-pub fn parse_file() -> Option<(Vec<String>, Vec<Vec<f32>>, Vec<String>)> {
-    let file_path = env::args().last().unwrap_or_default();
-    if !std::path::Path::new(&file_path).exists() {
-        return None;
-    }
+struct file_data {
+    names: Vec<String>,
+    data: HashMap<String, Vec<f32>>,
+    idx: Vec<String>
+}
 
-    let file = std::fs::File::open(file_path).ok()?;
-    use std::io::{self, BufRead};
-
-    let mut reader = io::BufReader::new(file);
-
-    let mut first_line = String::new();
-    reader.read_line(&mut first_line).ok()?;
-
-    let names: Vec<String> = first_line
-        .trim_end()
-        .split(',')
-        .map(|s| s.to_string())
-        .collect();
-
-    let mut data: Vec<Vec<f32>> = Vec::new();
-    let mut idx: Vec<String> = Vec::new();
-
-    for line in reader.lines().flatten() {
-        let row: Vec<f32> = line
+impl file_data {
+    fn new() -> Self {
+        let file_path = env::args().last().unwrap_or_default();
+        if !std::path::Path::new(&file_path).exists() {
+            panic!("File path does not exist: {}", file_path);
+        }
+    
+        let file = match std::fs::File::open(&file_path) {
+            Ok(f) => f,
+            Err(e) => panic!("Failed to open file: {}", e),
+        };
+        use std::io::{self, BufRead};
+    
+        let mut reader = io::BufReader::new(file);
+    
+        let mut first_line = String::new();
+        if let Err(e) = reader.read_line(&mut first_line) {
+            panic!("Failed to read first line: {}", e);
+        }
+    
+        let names: Vec<String> = first_line
+            .trim_end()
             .split(',')
-            .filter_map(|s| s.trim().parse::<f32>().ok())
+            .map(|s| s.to_string())
             .collect();
-        idx.push(row[0].to_string());
-        data.push(row[1..].to_vec());
-    }
+    
+        let mut data: HashMap<String, Vec<f32>> = Default::default();
+        let mut idx: Vec<String> = Vec::new();
+    
+        for line in reader.lines().flatten() {
+            let row: Vec<String> = line
+                .split(',')
+                .map(|s| s.to_string())
+                .collect();
+            idx.push(row[0].clone()
+        );
 
-    Some((names[1..].to_vec(), data, idx))
+            for (i, v) in row.iter().enumerate().skip(1) {
+                let name = &names[i];
+                let value: f32 = match v.parse() {
+                    Ok(val) => val,
+                    Err(e) => {
+                        eprintln!("Failed to parse value '{}' as f32 in column '{}': {}", v, name, e);
+                        continue;
+                    }
+                };
+                data.entry(name.clone()).or_insert_with(Vec::new).push(value);
+            }
+            
+        }
+    
+        file_data {
+            names: names[1..].to_vec(),
+            data,
+            idx
+        }
+    }
 }
