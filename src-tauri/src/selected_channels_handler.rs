@@ -71,7 +71,10 @@ impl ChannelSystem {
         self.groups.clear();
     }
 
-    pub fn get_groups(&self) -> &[Vec<Channel>] {
-        &self.groups
+    pub fn get_groups(&self) -> Vec<Vec<String>> {
+        self.groups
+            .iter()
+            .map(|group| group.iter().map(|ch| ch.name.clone()).collect())
+            .collect()
     }
 }
