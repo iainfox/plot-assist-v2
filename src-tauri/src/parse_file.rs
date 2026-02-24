@@ -63,4 +63,19 @@ impl FileData {
             idx,
         }
     }
+
+    fn get_data(&self, channel: String) -> Option<Vec<f32>> {
+        if self.names.contains(&channel) {
+            self.data.get(&channel);
+        }
+        None
+    }
+
+    fn get_names(&self) -> Vec<String> {
+        self.names.to_vec()
+    }
+
+    fn get_index(&self) -> Vec<String> {
+        self.idx.to_vec()
+    }
 }
