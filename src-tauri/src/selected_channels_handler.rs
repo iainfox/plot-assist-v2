@@ -53,11 +53,21 @@ impl ChannelSystem {
             }
         }
     }
- 
+
     pub fn remove_channels(&mut self, group_indices: Vec<usize>, channel_names: Vec<String>) {
+        let mut groups_to_remove: Vec<usize> = Vec::new();
         for &group_index in group_indices.iter() {
             if let Some(group) = self.groups.get_mut(group_index) {
                 group.retain(|ch: &Channel| !channel_names.contains(&ch.name));
+                if group.len() == 0 {
+                    groups_to_remove.push(group_index);
+                }
+            }
+        }
+        for i in (0..groups_to_remove.len()).rev() {
+            let idx = groups_to_remove[i];
+            if idx < self.groups.len() {
+                self.groups.remove(idx);
             }
         }
     }
