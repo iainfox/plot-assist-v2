@@ -25,23 +25,18 @@ impl ChannelSystem {
     }
 
     pub fn move_backward(&mut self, index: usize) {
-        let len = self.groups.len();
-        if len < 2 {
+        if self.groups.len() < 2 || index == 0 || index >= self.groups.len() {
             return;
         }
-
-        let prev = (len + index - 1) % len;
-        self.groups.swap(index, prev);
+        self.groups.swap(index, index - 1);
     }
 
     pub fn move_forward(&mut self, index: usize) {
         let len = self.groups.len();
-        if len < 2 {
+        if len < 2 || index + 1 >= len {
             return;
         }
-
-        let next = (index + 1) % len;
-        self.groups.swap(index, next);
+        self.groups.swap(index, index + 1);
     }
 
     pub fn combine(&mut self, a: usize, b: usize) {
