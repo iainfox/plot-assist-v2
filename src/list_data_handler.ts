@@ -21,12 +21,18 @@ function add_channel(list: HTMLElement, str: string) {
     console.log(`Added channel: ${str}`)
 }
 
-const names = await invoke<string[]>("get_channels", {});
-if (names.length != 0 && available_channels_list) {
+
+function data_added() {
+    if (!available_channels_list) return
     available_channels_list?.classList.remove("hidden");
     available_channels_list_warning?.classList.add("hidden");
 
     names.slice(1).forEach(str => { // skips the index column
         add_channel(available_channels_list, str);
     });
+}
+
+const names = await invoke<string[]>("get_channels", {});
+if (names.length != 0 && available_channels_list) {
+    data_added()
 }
