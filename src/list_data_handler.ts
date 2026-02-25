@@ -21,7 +21,7 @@ function add_channel(list: HTMLElement, str: string) {
     console.log(`Added channel: ${str}`)
 }
 
-function get_available(): String[] | undefined {
+function get_available(): string[] | undefined {
     if (!available_channels_list) return
 
     const checked_labels = Array.from(available_channels_list.querySelectorAll("input:checked + label"))
@@ -29,14 +29,14 @@ function get_available(): String[] | undefined {
     return checked_labels;
 }
 
-function get_selected(): [String, number][] | undefined {
+function get_selected(): [string, number][] | undefined {
     if (!selected_channels_list) return
 
-    let arr: [String, number][] = [];
+    let arr: [string, number][] = [];
 
     Array.from(selected_channels_list.querySelectorAll("input:checked + label"))
         .map((label: Element) => {
-            let name: String = label.textContent.substring(0, label.textContent.length - 4) || ""
+            let name: string = label.textContent.substring(0, label.textContent.length - 4) || ""
             let group: number = Number.parseInt(label.textContent.substring(label.textContent.length - 2, label.textContent.length - 1))
             arr.push([name, group])
         });
