@@ -21,6 +21,28 @@ function add_channel(list: HTMLElement, str: string) {
     console.log(`Added channel: ${str}`)
 }
 
+function get_available(): String[] | undefined {
+    if (!available_channels_list) return
+
+    const checked_labels = Array.from(available_channels_list.querySelectorAll("input:checked + label"))
+        .map((label: Element) => label.textContent || "");
+    return checked_labels;
+}
+
+function get_selected(): [String, number][] | undefined {
+    if (!selected_channels_list) return
+
+    let arr: [String, number][] = [];
+
+    Array.from(selected_channels_list.querySelectorAll("input:checked + label"))
+        .map((label: Element) => {
+            let name: String = label.textContent.substring(0, label.textContent.length - 4) || ""
+            let group: number = Number.parseInt(label.textContent.substring(label.textContent.length - 2, label.textContent.length - 1))
+            arr.push([name, group])
+        });
+
+    return arr
+}
 
 function data_added() {
     if (!available_channels_list) return
