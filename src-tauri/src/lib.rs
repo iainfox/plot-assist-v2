@@ -101,6 +101,12 @@ fn remove_all(state: tauri::State<Mutex<ChannelSystem>>) -> Vec<Vec<String>> {
     system.get_groups()
 }
 
+#[tauri::command]
+fn get_selected(state: tauri::State<Mutex<ChannelSystem>>) -> Vec<Vec<String>> {
+    let system = state.lock().unwrap();
+    system.get_groups()
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -116,7 +122,8 @@ pub fn run() {
             combine,
             add_channels,
             remove_channels,
-            remove_all
+            remove_all,
+            get_selected
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
