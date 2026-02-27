@@ -148,7 +148,7 @@ seperate_group?.addEventListener("click", async (e) => {
     const new_list = await invoke<string[][]>(
         "",
         {
-            
+
         }
     );
 
@@ -162,7 +162,7 @@ combine_groups?.addEventListener("click", async (e) => {
 
     let group_a_idx = 0
     let group_b_idx = 0
-    for (let i=1; i<selected.length; i++) {
+    for (let i = 1; i < selected.length; i++) {
         if (selected[group_a_idx][1] != selected[i][1]) {
             group_b_idx = i
         }
@@ -182,7 +182,7 @@ move_back?.addEventListener("click", async (e) => {
     if (!(selected.length > 0)) return
 
     let previously_moved_groups: number[] = [];
-    for (let i=0; i<selected.length; i++) {
+    for (let i = 0; i < selected.length; i++) {
         if (previously_moved_groups.includes(selected[i][1])) continue;
         previously_moved_groups.push(selected[i][1])
 
@@ -199,7 +199,7 @@ move_forward?.addEventListener("click", async (e) => {
     if (!(selected.length > 0)) return
 
     let previously_moved_groups: number[] = [];
-    for (let i=selected.length-1; i>=0; i--) {
+    for (let i = selected.length - 1; i >= 0; i--) {
         if (previously_moved_groups.includes(selected[i][1])) continue;
         previously_moved_groups.push(selected[i][1])
 
@@ -238,3 +238,28 @@ remove_all?.addEventListener("click", async (e) => {
     const new_list = await invoke<string[][]>("remove_all", {});
     update_selected(new_list)
 })
+
+const plot_button = document.getElementById("plot-button");
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow"
+let plot_window_counter = 0
+
+plot_button?.addEventListener("click", async (e) => {
+    plot_window_counter++
+    const plot_window = new WebviewWindow(`plot-window-${plot_window_counter}`, {
+        url: "./src/plot_window/index.html",
+        title: `Plot ${plot_window_counter}`,
+
+        x: 0,
+        y: 0,
+        width: 1050,
+        height: 400,
+    });
+
+    plot_window.once('tauri://created', function () {
+        plot_window.show()
+    });
+
+    plot_window.once('tauri://error', function (e) {
+        console.log(e)
+    });
+});
