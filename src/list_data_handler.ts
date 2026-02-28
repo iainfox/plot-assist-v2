@@ -97,10 +97,13 @@ function selected_payload() {
     return (s ?? []).map(([channelName, groupIndex]) => ({ groupIndex, channelName }));
 }
 
-const names = await invoke<string[]>("get_channels", {});
-if (names.length != 0 && available_channels_list) {
-    data_added()
-}
+let names: string[] = [];
+(async () => {
+    names = await invoke<string[]>("get_channels", {});
+    if (names.length != 0 && available_channels_list) {
+        data_added();
+    }
+})();
 
 add_all?.addEventListener("click", async () => {
     if (!available_channels_list) return;
