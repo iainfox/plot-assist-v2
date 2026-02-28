@@ -42,6 +42,26 @@ fn move_forward(state: tauri::State<Mutex<ChannelSystem>>, group_index: usize) -
 }
 
 #[tauri::command]
+fn move_backward_batch(
+    state: tauri::State<Mutex<ChannelSystem>>,
+    group_indices: Vec<usize>,
+) -> Vec<Vec<String>> {
+    let mut system = state.lock().unwrap();
+    system.move_backward_batch(group_indices);
+    system.get_groups()
+}
+
+#[tauri::command]
+fn move_forward_batch(
+    state: tauri::State<Mutex<ChannelSystem>>,
+    group_indices: Vec<usize>,
+) -> Vec<Vec<String>> {
+    let mut system = state.lock().unwrap();
+    system.move_forward_batch(group_indices);
+    system.get_groups()
+}
+
+#[tauri::command]
 fn combine(
     state: tauri::State<Mutex<ChannelSystem>>,
     group_a: usize,
@@ -119,6 +139,8 @@ pub fn run() {
             get_data,
             move_backward,
             move_forward,
+            move_backward_batch,
+            move_forward_batch,
             combine,
             add_channels,
             remove_channels,

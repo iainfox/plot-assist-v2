@@ -177,37 +177,19 @@ combine_groups?.addEventListener("click", async (e) => {
 })
 
 move_back?.addEventListener("click", async (e) => {
-    let selected = get_selected()
-    if (!selected) return
-    if (!(selected.length > 0)) return
-
-    let previously_moved_groups: number[] = [];
-    for (let i = 0; i < selected.length; i++) {
-        if (previously_moved_groups.includes(selected[i][1])) continue;
-        previously_moved_groups.push(selected[i][1])
-
-        const new_list = await invoke<string[][]>("move_backward", {
-            groupIndex: selected[i][1]
-        });
-        update_selected(new_list)
-    }
-})
+    const selected = get_selected();
+    if (!selected || selected.length === 0) return;
+    const groupIndices = [...new Set(selected.map(([, g]) => g))];
+    const new_list = await invoke<string[][]>("move_backward_batch", { groupIndices });
+    update_selected(new_list);
+});
 
 move_forward?.addEventListener("click", async (e) => {
-    let selected = get_selected()
-    if (!selected) return
-    if (!(selected.length > 0)) return
-
-    let previously_moved_groups: number[] = [];
-    for (let i = selected.length - 1; i >= 0; i--) {
-        if (previously_moved_groups.includes(selected[i][1])) continue;
-        previously_moved_groups.push(selected[i][1])
-
-        const new_list = await invoke<string[][]>("move_forward", {
-            groupIndex: selected[i][1]
-        });
-        update_selected(new_list)
-    }
+    const selected = get_selected();
+    if (!selected || selected.length === 0) return;
+    const groupIndices = [...new Set(selected.map(([, g]) => g))];
+    const new_list = await invoke<string[][]>("move_forward_batch", { groupIndices });
+    update_selected(new_list);
 });
 
 remove_selected?.addEventListener("click", async (e) => {
