@@ -39,24 +39,6 @@ impl ChannelSystem {
         self.groups.swap(index, index + 1);
     }
 
-    pub fn move_backward_batch(&mut self, indices: Vec<usize>) {
-        let mut sorted: Vec<usize> = indices.into_iter().collect();
-        sorted.sort();
-        sorted.dedup();
-        for i in sorted {
-            self.move_backward(i);
-        }
-    }
-
-    pub fn move_forward_batch(&mut self, indices: Vec<usize>) {
-        let mut sorted: Vec<usize> = indices.into_iter().collect();
-        sorted.sort_by(|a, b| b.cmp(a));
-        sorted.dedup();
-        for i in sorted {
-            self.move_forward(i);
-        }
-    }
-
     pub fn combine(&mut self, a: usize, b: usize) {
         let mut other = self.groups.remove(b);
         self.groups[a].append(&mut other);
