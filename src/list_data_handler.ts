@@ -39,15 +39,28 @@ function clear_list(list: HTMLElement) {
     }
 }
 
-function update_selected(new_list: string[][]) {
-    if (!selected_channels_list) return
+type GroupsResponse = { groups: string[][]; selectedAfter: { groupIndex: number; channelName: string }[] };
 
-    clear_list(selected_channels_list)
-    for (let group_number = 0; group_number < new_list.length; group_number++) {
-        new_list[group_number].forEach(str => {
-            add_channel(selected_channels_list, str + ` [${group_number}]`)
+function update_selected_from_response(resp: GroupsResponse) {
+    if (!selected_channels_list) return;
+
+    clear_list(selected_channels_list);
+    for (let group_index = 0; group_index < resp.groups.length; group_index++) {
+        resp.groups[group_index].forEach((channelName) => {
+            add_channel(selected_channels_list, channelName + ` [${group_index}]`);
         });
     }
+    const selSet = new Set(resp.selectedAfter.map((s) => `${s.groupIndex}\t${s.channelName}`));
+    selected_channels_list.querySelectorAll("input.channel").forEach((input) => {
+        const li = (input as HTMLInputElement).closest("li");
+        const label = li?.querySelector("label");
+        const text = label?.textContent?.trim() ?? "";
+        const m = text.match(/^(.*)\s*\[(\d+)\]$/);
+        if (m) {
+            const key = `${m[2]}\t${m[1].trim()}`;
+            if (selSet.has(key)) (input as HTMLInputElement).checked = true;
+        }
+    });
 }
 
 function get_available(): string[] | undefined {
@@ -59,18 +72,14 @@ function get_available(): string[] | undefined {
 }
 
 function get_selected(): [string, number][] | undefined {
-    if (!selected_channels_list) return
-
-    let arr: [string, number][] = [];
-
-    Array.from(selected_channels_list.querySelectorAll("input:checked + label"))
-        .map((label: Element) => {
-            let name: string = label.textContent.substring(0, label.textContent.length - 4) || ""
-            let group: number = Number.parseInt(label.textContent.substring(label.textContent.length - 2, label.textContent.length - 1))
-            arr.push([name, group])
-        });
-
-    return arr
+    if (!selected_channels_list) return;
+    const arr: [string, number][] = [];
+    Array.from(selected_channels_list.querySelectorAll("input:checked + label")).forEach((label: Element) => {
+        const text = (label as HTMLElement).textContent?.trim() ?? "";
+        const m = text.match(/^(.*)\s*\[(\d+)\]$/);
+        if (m) arr.push([m[1].trim(), Number(m[2])]);
+    });
+    return arr;
 }
 
 function data_added() {
@@ -83,143 +92,122 @@ function data_added() {
     });
 }
 
+function selected_payload() {
+    const s = get_selected();
+    return (s ?? []).map(([channelName, groupIndex]) => ({ groupIndex, channelName }));
+}
+
 const names = await invoke<string[]>("get_channels", {});
 if (names.length != 0 && available_channels_list) {
     data_added()
 }
 
-add_all?.addEventListener("click", async (e) => {
-    if (!available_channels_list) return
-
-    const new_list = await invoke<string[][]>(
-        "add_channels",
-        {
-            channelNames: Array.from(available_channels_list.children).map((el) => (el as HTMLElement).textContent?.trim() || ""),
-            grouped: false
-        }
-    );
-
-    update_selected(new_list)
+add_all?.addEventListener("click", async () => {
+    if (!available_channels_list) return;
+    const resp = await invoke<GroupsResponse>("add_channels", {
+        channelNames: Array.from(available_channels_list.children).map((el) => (el as HTMLElement).textContent?.trim() || ""),
+        grouped: false,
+        selected: selected_payload(),
+    });
+    update_selected_from_response(resp);
 });
 
-add_all_grouped?.addEventListener("click", async (e) => {
-    if (!available_channels_list) return
+add_all_grouped?.addEventListener("click", async () => {
+    if (!available_channels_list) return;
+    const resp = await invoke<GroupsResponse>("add_channels", {
+        channelNames: Array.from(available_channels_list.children).map((el) => (el as HTMLElement).textContent?.trim() || ""),
+        grouped: true,
+        selected: selected_payload(),
+    });
+    update_selected_from_response(resp);
+});
 
-    const new_list = await invoke<string[][]>(
-        "add_channels",
-        {
-            channelNames: Array.from(available_channels_list.children).map((el) => (el as HTMLElement).textContent?.trim() || ""),
-            grouped: true
-        }
-    );
+add_selected?.addEventListener("click", async () => {
+    if (!available_channels_list) return;
+    const resp = await invoke<GroupsResponse>("add_channels", {
+        channelNames: get_available(),
+        grouped: false,
+        selected: selected_payload(),
+    });
+    update_selected_from_response(resp);
+});
 
-    update_selected(new_list)
-})
+add_selected_grouped?.addEventListener("click", async () => {
+    if (!available_channels_list) return;
+    const resp = await invoke<GroupsResponse>("add_channels", {
+        channelNames: get_available(),
+        grouped: true,
+        selected: selected_payload(),
+    });
+    update_selected_from_response(resp);
+});
 
-add_selected?.addEventListener("click", async (e) => {
-    if (!available_channels_list) return
+seperate_group?.addEventListener("click", async () => {
+    const resp = await invoke<GroupsResponse>("", {});
+    update_selected_from_response(resp);
+});
 
-    const new_list = await invoke<string[][]>(
-        "add_channels",
-        {
-            channelNames: get_available(),
-            grouped: false
-        }
-    );
-
-    update_selected(new_list)
-})
-
-add_selected_grouped?.addEventListener("click", async (e) => {
-    if (!available_channels_list) return
-
-    const new_list = await invoke<string[][]>(
-        "add_channels",
-        {
-            channelNames: get_available(),
-            grouped: true
-        }
-    );
-
-    update_selected(new_list)
-})
-
-seperate_group?.addEventListener("click", async (e) => {
-    const new_list = await invoke<string[][]>(
-        "",
-        {
-
-        }
-    );
-
-    update_selected(new_list)
-})
-
-combine_groups?.addEventListener("click", async (e) => {
-    let selected = get_selected()
-    if (!selected) return
-    if (!(selected.length > 1)) return
-
-    let group_a_idx = 0
-    let group_b_idx = 0
+combine_groups?.addEventListener("click", async () => {
+    const selected = get_selected();
+    if (!selected || selected.length <= 1) return;
+    let group_a_idx = 0;
+    let group_b_idx = 0;
     for (let i = 1; i < selected.length; i++) {
-        if (selected[group_a_idx][1] != selected[i][1]) {
-            group_b_idx = i
-        }
+        if (selected[group_a_idx][1] !== selected[i][1]) group_b_idx = i;
     }
-    if (group_a_idx == group_b_idx) return
-
-    const new_list = await invoke<string[][]>("combine", {
+    if (group_a_idx === group_b_idx) return;
+    const resp = await invoke<GroupsResponse>("combine", {
         groupA: selected[group_a_idx][1],
         groupB: selected[group_b_idx][1],
+        selected: selected_payload(),
     });
-    update_selected(new_list)
-})
+    update_selected_from_response(resp);
+});
 
-move_back?.addEventListener("click", async (e) => {
+move_back?.addEventListener("click", async () => {
     const selected = get_selected();
     if (!selected || selected.length === 0) return;
     const groupIndices = [...new Set(selected.map(([, g]) => g))];
-    const new_list = await invoke<string[][]>("move_backward_batch", { groupIndices });
-    update_selected(new_list);
+    const resp = await invoke<GroupsResponse>("move_backward_batch", {
+        groupIndices,
+        selected: selected_payload(),
+    });
+    update_selected_from_response(resp);
 });
 
-move_forward?.addEventListener("click", async (e) => {
+move_forward?.addEventListener("click", async () => {
     const selected = get_selected();
     if (!selected || selected.length === 0) return;
     const groupIndices = [...new Set(selected.map(([, g]) => g))];
-    const new_list = await invoke<string[][]>("move_forward_batch", { groupIndices });
-    update_selected(new_list);
+    const resp = await invoke<GroupsResponse>("move_forward_batch", {
+        groupIndices,
+        selected: selected_payload(),
+    });
+    update_selected_from_response(resp);
 });
 
-remove_selected?.addEventListener("click", async (e) => {
-    if (!available_channels_list) return
-
-    let selected = get_selected();
-    let groupIndices: number[] = [];
-    let channelNames: string[] = [];
+remove_selected?.addEventListener("click", async () => {
+    const selected = get_selected();
+    const groupIndices: number[] = [];
+    const channelNames: string[] = [];
     if (selected) {
         for (let i = 0; i < selected.length; i++) {
             groupIndices.push(selected[i][1]);
             channelNames.push(selected[i][0]);
         }
     }
+    const resp = await invoke<GroupsResponse>("remove_channels", {
+        groupIndices,
+        channelNames,
+        selected: selected_payload(),
+    });
+    update_selected_from_response(resp);
+});
 
-    const new_list = await invoke<string[][]>(
-        "remove_channels",
-        {
-            groupIndices: groupIndices,
-            channelNames: channelNames
-        }
-    );
-
-    update_selected(new_list)
-})
-
-remove_all?.addEventListener("click", async (e) => {
-    const new_list = await invoke<string[][]>("remove_all", {});
-    update_selected(new_list)
-})
+remove_all?.addEventListener("click", async () => {
+    const resp = await invoke<GroupsResponse>("remove_all", {});
+    update_selected_from_response(resp);
+});
 
 const plot_button = document.getElementById("plot-button");
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow"
