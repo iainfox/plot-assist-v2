@@ -7,6 +7,20 @@ use parse_file::FileData;
 mod selected_channels_handler;
 use selected_channels_handler::{Channel, ChannelSystem};
 
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SelectedItem {
+    group_index: usize,
+    channel_name: String,
+}
+
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct GroupsResponse {
+    groups: Vec<Vec<String>>,
+    selected_after: Vec<SelectedItem>,
+}
+
 #[tauri::command]
 fn get_channels(state: tauri::State<FileData>) -> Vec<String> {
     state.get_names().to_vec()
@@ -45,20 +59,70 @@ fn move_forward(state: tauri::State<Mutex<ChannelSystem>>, group_index: usize) -
 fn move_backward_batch(
     state: tauri::State<Mutex<ChannelSystem>>,
     group_indices: Vec<usize>,
-) -> Vec<Vec<String>> {
+    selected: Vec<SelectedItem>,
+) -> GroupsResponse {
     let mut system = state.lock().unwrap();
-    system.move_backward_batch(group_indices);
-    system.get_groups()
+    let n = system.get_groups().len();
+    let mut pos: Vec<usize> = (0..n).collect();
+    let mut sorted: Vec<usize> = group_indices.into_iter().collect();
+    sorted.sort();
+    sorted.dedup();
+    for i in sorted {
+        system.move_backward(i);
+        if i > 0 && i < pos.len() {
+            pos.swap(i, i - 1);
+        }
+    }
+    let groups = system.get_groups();
+    let selected_after: Vec<SelectedItem> = selected
+        .into_iter()
+        .filter_map(|s| {
+            let new_gi = pos.iter().position(|&p| p == s.group_index)?;
+            Some(SelectedItem {
+                group_index: new_gi,
+                channel_name: s.channel_name,
+            })
+        })
+        .collect();
+    GroupsResponse {
+        groups,
+        selected_after,
+    }
 }
 
 #[tauri::command]
 fn move_forward_batch(
     state: tauri::State<Mutex<ChannelSystem>>,
     group_indices: Vec<usize>,
-) -> Vec<Vec<String>> {
+    selected: Vec<SelectedItem>,
+) -> GroupsResponse {
     let mut system = state.lock().unwrap();
-    system.move_forward_batch(group_indices);
-    system.get_groups()
+    let n = system.get_groups().len();
+    let mut pos: Vec<usize> = (0..n).collect();
+    let mut sorted: Vec<usize> = group_indices.into_iter().collect();
+    sorted.sort_by(|a, b| b.cmp(a));
+    sorted.dedup();
+    for i in sorted {
+        system.move_forward(i);
+        if i + 1 < pos.len() {
+            pos.swap(i, i + 1);
+        }
+    }
+    let groups = system.get_groups();
+    let selected_after: Vec<SelectedItem> = selected
+        .into_iter()
+        .filter_map(|s| {
+            let new_gi = pos.iter().position(|&p| p == s.group_index)?;
+            Some(SelectedItem {
+                group_index: new_gi,
+                channel_name: s.channel_name,
+            })
+        })
+        .collect();
+    GroupsResponse {
+        groups,
+        selected_after,
+    }
 }
 
 #[tauri::command]
@@ -66,11 +130,31 @@ fn combine(
     state: tauri::State<Mutex<ChannelSystem>>,
     group_a: usize,
     group_b: usize,
-) -> Vec<Vec<String>> {
+    selected: Vec<SelectedItem>,
+) -> GroupsResponse {
     let mut system = state.lock().unwrap();
-
     system.combine(group_a, group_b);
-    system.get_groups()
+    let groups = system.get_groups();
+    let selected_after: Vec<SelectedItem> = selected
+        .into_iter()
+        .map(|s| {
+            let new_gi = if s.group_index == group_b {
+                group_a
+            } else if s.group_index > group_b {
+                s.group_index - 1
+            } else {
+                s.group_index
+            };
+            SelectedItem {
+                group_index: new_gi,
+                channel_name: s.channel_name,
+            }
+        })
+        .collect();
+    GroupsResponse {
+        groups,
+        selected_after,
+    }
 }
 
 #[tauri::command]
@@ -79,7 +163,8 @@ fn add_channels(
     file_data: tauri::State<FileData>,
     channel_names: Vec<String>,
     grouped: bool,
-) -> Vec<Vec<String>> {
+    selected: Vec<SelectedItem>,
+) -> GroupsResponse {
     let mut system = state.lock().unwrap();
 
     let mut channels: Vec<Channel> = Vec::new();
@@ -98,7 +183,11 @@ fn add_channels(
     }
 
     system.add_channels(channels, grouped);
-    system.get_groups()
+    let groups = system.get_groups();
+    GroupsResponse {
+        groups,
+        selected_after: selected,
+    }
 }
 
 #[tauri::command]
@@ -106,19 +195,24 @@ fn remove_channels(
     state: tauri::State<Mutex<ChannelSystem>>,
     group_indices: Vec<usize>,
     channel_names: Vec<String>,
-) -> Vec<Vec<String>> {
+) -> GroupsResponse {
     let mut system = state.lock().unwrap();
 
     system.remove_channels(group_indices, channel_names);
-    system.get_groups()
+    GroupsResponse {
+        groups: system.get_groups(),
+        selected_after: vec![],
+    }
 }
 
 #[tauri::command]
-fn remove_all(state: tauri::State<Mutex<ChannelSystem>>) -> Vec<Vec<String>> {
+fn remove_all(state: tauri::State<Mutex<ChannelSystem>>) -> GroupsResponse {
     let mut system = state.lock().unwrap();
-
     system.remove_all();
-    system.get_groups()
+    GroupsResponse {
+        groups: system.get_groups(),
+        selected_after: vec![],
+    }
 }
 
 #[tauri::command]
