@@ -79,7 +79,21 @@ function chart_generator(data: number[][], indices: string[]): ApexCharts {
 	return chart
 }
 
-chart_generator(
-	[[10, 41, 35, 51, 49, 62, 69], [23, 12, 54, 61, 32, 56, 81], [5, 15, 25, 35, 45, 55, 65]],
-	["Sales", "Revenue", "Growth"]
-)
+let charts: ApexCharts[] = []
+for (let group_idx = 0; group_idx < selected.length; group_idx++) {
+
+	const group_channels = selected[group_idx];
+
+	const group_data: number[][] = await Promise.all(
+		group_channels.map(async (channel) => {
+			const data: number[] | null = await invoke("get_data", { channel });
+			return data ?? [];
+		})
+	);
+
+	chart_generator(group_data, group_channels);
+}
+
+if (charts.length > 0) {
+	charts[0].resetSeries()
+}
