@@ -96,7 +96,10 @@ for (let group_idx = 0; group_idx < selected.length; group_idx++) {
 		})
 	);
 
-	chart_generator(group_data, group_channels);
+	const chart = chart_generator(group_data, group_channels);
+	if (chart) {
+		charts.push(chart)
+	}
 }
 
 if (charts.length > 0) {
