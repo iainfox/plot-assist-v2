@@ -213,7 +213,7 @@ const plot_button = document.getElementById("plot-button");
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow"
 let plot_window_counter = 0
 
-plot_button?.addEventListener("click", async (e) => {
+plot_button?.addEventListener("click", async (_) => {
     plot_window_counter++
     const plot_window = new WebviewWindow(`plot-window-${plot_window_counter}`, {
         url: "./src/plot_window/index.html",
