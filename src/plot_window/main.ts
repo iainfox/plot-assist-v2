@@ -46,7 +46,10 @@ const baseOptions = {
 };
 
 let chart_counter = 0
-function chart_generator(data: number[][], indices: string[]): ApexCharts {
+function chart_generator(data: number[][], indices: string[]): ApexCharts | null {
+	if (!indices || indices.length === 0) {
+		return null;
+	}
 	const chartContainer = document.createElement("div")
 	chartContainer.className = "chart-container"
 
@@ -83,6 +86,8 @@ let charts: ApexCharts[] = []
 for (let group_idx = 0; group_idx < selected.length; group_idx++) {
 
 	const group_channels = selected[group_idx];
+
+	if (!group_channels || group_channels.length === 0) continue;
 
 	const group_data: number[][] = await Promise.all(
 		group_channels.map(async (channel) => {
