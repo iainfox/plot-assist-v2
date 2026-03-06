@@ -82,7 +82,7 @@ function get_selected(): [string, number][] | undefined {
     return arr;
 }
 
-function data_added() {
+export function data_added(names: string[]) {
     if (!available_channels_list) return
     available_channels_list?.classList.remove("hidden");
     available_channels_list_warning?.classList.add("hidden");
@@ -97,11 +97,10 @@ function selected_payload() {
     return (s ?? []).map(([channelName, groupIndex]) => ({ groupIndex, channelName }));
 }
 
-let names: string[] = [];
 (async () => {
-    names = await invoke<string[]>("get_channels", {});
+    const names = await invoke<string[]>("get_channels", {});
     if (names.length != 0 && available_channels_list) {
-        data_added();
+        data_added(names);
     }
 })();
 

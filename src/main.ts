@@ -2,6 +2,7 @@ import "./available_channels";
 import "./selection_utils";
 import "./selected_channels";
 import "./list_data_handler";
+import "./file_input"
 import { select_all } from "./selection_utils";
 
 const available_channels_list = document.getElementById("available-channels");

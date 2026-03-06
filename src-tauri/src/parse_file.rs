@@ -9,8 +9,18 @@ pub struct FileData {
 impl FileData {
     pub fn new() -> Self {
         let file_path = env::args().last().unwrap_or_default();
+
         if !std::path::Path::new(&file_path).exists() {
             panic!("File path does not exist: {}", file_path);
+        }
+
+        if !file_path.ends_with(".csv") {
+            println!("File is not a csv file: {}", file_path);
+            return Self {
+                names: Vec::new(),
+                data: HashMap::new(),
+                idx: Vec::new(),
+            }
         }
 
         let file = match std::fs::File::open(&file_path) {
@@ -62,6 +72,57 @@ impl FileData {
             data,
             idx,
         }
+    }
+
+    pub fn parse_file_from_text(&mut self, content: &str) {
+        let mut lines = content.lines();
+
+        let first_line = match lines.next() {
+            Some(line) => line,
+            None => return,
+        };
+        let names: Vec<String> = first_line
+            .trim_end()
+            .split(',')
+            .map(|s| s.to_string())
+            .collect();
+
+        let mut data: HashMap<String, Vec<f32>> = HashMap::new();
+        let mut idx: Vec<String> = Vec::new();
+
+        for line in lines {
+            if line.trim().is_empty() {
+                continue;
+            }
+            let row: Vec<&str> = line.split(',').collect();
+            if row.is_empty() {
+                continue;
+            }
+            idx.push(row[0].to_string());
+
+            for (i, v) in row.iter().enumerate().skip(1) {
+                if i >= names.len() {
+                    continue;
+                }
+                let name = &names[i];
+                let value: f32 = match v.trim().parse() {
+                    Ok(val) => val,
+                    Err(e) => {
+                        eprintln!(
+                            "Failed to parse value '{}' as f32 in column '{}': {}",
+                            v, name, e
+                        );
+                        continue;
+                    }
+                };
+                data.entry(name.clone())
+                    .or_insert_with(Vec::new)
+                    .push(value);
+            }
+        }
+        self.names = names[1..].to_vec();
+        self.data = data;
+        self.idx = idx;
     }
 
     pub fn get_data(&self, channel: &str) -> Option<&[f32]> {

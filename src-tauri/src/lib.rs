@@ -22,18 +22,32 @@ struct GroupsResponse {
 }
 
 #[tauri::command]
-fn get_channels(state: tauri::State<FileData>) -> Vec<String> {
-    state.get_names().to_vec()
+fn get_channels(state: tauri::State<Mutex<FileData>>) -> Vec<String> {
+    let system = state.lock().unwrap();
+    system.get_names().to_vec()
 }
 
 #[tauri::command]
-fn get_index(state: tauri::State<FileData>) -> Vec<String> {
-    state.get_index().to_vec()
+fn get_index(state: tauri::State<Mutex<FileData>>) -> Vec<String> {
+    let system = state.lock().unwrap();
+    system.get_index().to_vec()
 }
 
 #[tauri::command]
-fn get_data(state: tauri::State<FileData>, channel: String) -> Option<Vec<f32>> {
-    Some(state.get_data(&channel)?.to_vec())
+fn get_data(state: tauri::State<Mutex<FileData>>, channel: String) -> Option<Vec<f32>> {
+    let system = state.lock().unwrap();
+    Some(system.get_data(&channel)?.to_vec())
+}
+
+#[tauri::command]
+fn parse_file_from_text(
+    state: tauri::State<Mutex<FileData>>,
+    file_data: &str
+) -> Vec<String> {
+    let mut system = state.lock().unwrap();
+
+    system.parse_file_from_text(file_data);
+    system.get_names().to_vec()
 }
 
 #[tauri::command]
@@ -160,12 +174,13 @@ fn combine(
 #[tauri::command]
 fn add_channels(
     state: tauri::State<Mutex<ChannelSystem>>,
-    file_data: tauri::State<FileData>,
+    file_data_state: tauri::State<Mutex<FileData>>,
     channel_names: Vec<String>,
     grouped: bool,
     selected: Vec<SelectedItem>,
 ) -> GroupsResponse {
     let mut system = state.lock().unwrap();
+    let file_data = file_data_state.lock().unwrap();
 
     let mut channels: Vec<Channel> = Vec::new();
     let file_names: Vec<String> = file_data.get_names().to_vec();
@@ -224,13 +239,14 @@ fn get_selected(state: tauri::State<Mutex<ChannelSystem>>) -> Vec<Vec<String>> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .manage(FileData::new())
+        .manage(Mutex::new(FileData::new()))
         .manage(Mutex::new(ChannelSystem::new()))
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             get_channels,
             get_index,
             get_data,
+            parse_file_from_text,
             move_backward,
             move_forward,
             move_backward_batch,
